@@ -1,17 +1,3 @@
-```
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   client_tester                                      :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: dfurneau <dfurneau@student.42abudhabi.ae>  +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/03/14 10:10:48 by dfurneau          #+#    #+#             */
-/*   Updated: 2023/03/14 10:10:50 by dfurneau         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-```
-
 # Client Tester
 
 This tester creates multiple clients that connect to the server and send messages at
