@@ -3,16 +3,16 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: dfurneau <dfurneau@student.42abudhabi.ae>  +#+  +:+       +#+         #
+#    By: dfurneau <dfurneau@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/07 07:25:25 by dfurneau          #+#    #+#              #
-#    Updated: 2023/03/14 11:24:47 by dfurneau         ###   ########.fr        #
+#    Updated: 2023/03/15 14:51:15 by dfurneau         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME		=	client-tester
 
-SSRCS		=	./client-tester.cpp
+SSRCS		=	./client-tester.cpp ./client-message.cpp
 
 
 SOBJS		=	${SSRCS:.cpp=.o}

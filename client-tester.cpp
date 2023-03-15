@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   client-tester.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dfurneau <dfurneau@student.42abudhabi.ae>  +#+  +:+       +#+        */
+/*   By: dfurneau <dfurneau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 10:12:40 by dfurneau          #+#    #+#             */
-/*   Updated: 2023/03/14 12:05:00 by dfurneau         ###   ########.fr       */
+/*   Updated: 2023/03/15 15:18:31 by dfurneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "client-tester.hpp"
+#include "client-message.hpp"
 
 #ifndef RECONNECT_ON_MSG
 # define RECONNECT_ON_MSG false
@@ -150,20 +151,37 @@ void clientTester::run( void ) {
     if ( !RECONNECT_ON_MSG )
         ircconnect();
 
-    while ( running() ) {
+    clientMessage comms = * new clientMessage(m_clientId, "pass");
+
+    comms.authorizeClient();
+    comms.joinOwnChannel();
+    comms.joinChannel(std::to_string(m_seconds));
+    comms.joinOwnChannel();
+    comms.inviteToOwnChannel(std::to_string(m_seconds));
+    comms.setTopicToOwnName("#" + std::to_string(m_clientId));
+    comms.setChannelTopic("#" +  std::to_string(m_seconds), "derp derp derp");
+    comms.inviteToOwnChannel("1");
+    comms.quitIrc("I'm an idiot...");
+
+    while ( running() && comms.getMessages().size() ) {
         try {
             if ( RECONNECT_ON_MSG )
                 ircconnect();
 
             std::this_thread::sleep_for( std::chrono::milliseconds( 250 ) );
-            ircsend( ss.str() );
+            ircsend( comms.getMessages().front() );
             std::this_thread::sleep_for( std::chrono::milliseconds( 250 ));
 
             if ( RECONNECT_ON_MSG )
                 ircdisconnect();
 
+            comms.getMessages().pop();
+
             for ( int i = 0; i <= m_seconds && running(); i++ )
                 std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
+
+            if ( !RECONNECT_ON_MSG && !comms.getMessages().size())
+                break;
         }
         catch ( std::ios_base::failure& ex ) {
             mtx.lock();
