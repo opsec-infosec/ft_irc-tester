@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: dfurneau <dfurneau@student.42.fr>          +#+  +:+       +#+         #
+#    By: dfurneau <dfurneau@student.42abudhabi.ae>  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/07 07:25:25 by dfurneau          #+#    #+#              #
-#    Updated: 2023/03/15 14:51:15 by dfurneau         ###   ########.fr        #
+#    Updated: 2023/03/15 19:35:11 by dfurneau         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,7 @@ SSRCS		=	./client-tester.cpp ./client-message.cpp
 
 SOBJS		=	${SSRCS:.cpp=.o}
 CXX			=	c++
-CXXFLAGS	=	-Wall -Wextra -Werror -std=c++20 ${D} ${OPTIMIZE} #${DEBUG}
+CXXFLAGS	=	-Wall -Wextra -Werror -std=c++2a ${D} ${OPTIMIZE} #${DEBUG}
 LIBS		=	-pthread
 DEBUG		=	-g3
 OPTIMIZE	=	-O2

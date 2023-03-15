@@ -2,4 +2,4 @@
 -Wall
 -Werror
 -Wextra
--std=c++20
+-std=c++2a
