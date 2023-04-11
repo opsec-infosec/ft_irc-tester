@@ -58,7 +58,68 @@ To build this option, issue the following command:
 ```sh
 make all D="-D RECONNECT_ON_MSG"
 ```
+<br>
 
+# Configuration Files
+
+Located in the ./conf directory are several configuration files for sending messages, in this case to an irc server.  The files are as follows
+
+1. replace.conf
+2. connect.conf
+3. after-connect.conf
+4. loop.conf
+5. disconnect.conf
+
+There are special paramters {0}, {1}... {4} that replace internal variables in the .conf files.  Further description on the different variables available are listed below.
+<br>
+<br>
+## replace.conf
+
+The replace.conf file is used to replace text in the  < > with the value specified.
+
+```
+<password> xxxx
+<nick> client
+```
+
+Every tag `<password>` will be replaced by xxxx, similare to `<nick>` which will be replaced by the word client in all the .conf files.
+<br>
+
+
+## connect.conf
+
+The connect.conf file is executed during the connection of a client to the server, the execution only happens once.  Commands in this file are send in rapid succession.
+<br>
+### after-connect.conf
+
+The after-connect.conf file is executed after establishing the connection to the server and are executed only once.
+
+<br>
+
+## loop.conf
+
+The loop.conf file contains commands that are executed in a loop, sent at a random interval of time.
+<br>
+
+### disconnect.conf
+
+The disconnect.conf file is executed when the client disconnects from the server.  Since the client tester is running in an infinite loop, a control C will stop the client tester and the disconnect.conf commands will be executed on the server.
+
+<br>
+
+## Special Variables
+
+There are some special variables that can be used in all the .conf files that get replaced by the client-tester.  The following values can be used:
+
+{0} = replaced with the IP Address specified on the command line during startup
+
+{1} = replaced with the port number specified on the command line during startup
+
+{2} = replaced with the ClientId.  The ClientId is a internal numbers that is assigned durinmg the starting of each client.  The ClientID starts from 0...n, where n is the number of clients.  Each clientId is incremented by 1 on each client creation.
+
+{3} = replaced with the time interval of the clients send loop, and ranges from 3 to 60 seconds.
+
+{4} = replaced with the internal File Descriptor that is used to connect to the server.  Like the ClientId, the operating system will increment on each open / connect to the server.
 <br>
 <br>
 

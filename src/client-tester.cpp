@@ -6,123 +6,29 @@
 /*   By: dfurneau <dfurneau@student.42abudhabi.ae>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 10:12:40 by dfurneau          #+#    #+#             */
-/*   Updated: 2023/03/14 12:05:00 by dfurneau         ###   ########.fr       */
+/*   Updated: 2023/04/12 02:24:02 by dfurneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "client-tester.hpp"
+#include "../includes/client-tester.hpp"
+#include "../includes/parse.hpp"
+#include "../includes/thread.hpp"
 
 #ifndef RECONNECT_ON_MSG
 # define RECONNECT_ON_MSG false
 #endif
 
-std::mutex mtx;
-
-//
-// Signal Handler
-//
-namespace {
-    volatile std::atomic<int> gSignalStatus( 0 );
-    static_assert( std::atomic<int>::is_always_lock_free );
-}
-
-void signalHandler( int signal ) {
-    gSignalStatus.store( signal );
-}
-
-//
-// Thread Program
-//
-class threadObj {
-public:
-    void operator()( std::string ipAddress, int port, int clientId )
-    {
-        clientTester client = clientTester( ipAddress, port, clientId );
-        mtx.lock();
-        std::cout << "Client " << clientId << " exited" << std::endl;
-        mtx.unlock();
-    }
-};
-
-//
-// Check if IP is valid called from main
-//
-bool isValidIp( std::string ip ) {
-    if ( ip.size() < 7 )
-        return false;
-
-    std::vector<std::string> v;
-    std::stringstream ss( ip );
-
-    while ( ss.good() ) {
-        std::string substr;
-        getline( ss, substr, '.' );
-        v.push_back( substr );
-    }
-
-    if ( v.size() != 4 )
-        return false;
-
-    for ( std::vector<std::string>::const_iterator cit = v.cbegin(); cit != v.cend(); cit++ ) {
-        if ( cit->size() > 1 && (*cit)[0] == '0' )
-            return false;
-
-        if ( std::count_if( cit->begin(), cit->end(), isalpha ) )
-            return false;
-
-        if ( stoi( *cit ) > 255 || ( std::distance( v.cbegin(), cit ) == 3 && stoi( *cit ) == 0 ) )
-            return false;
-    }
-    return true;
-}
-
-//
-// Usage called from main
-//
-int usage( std::string prg ) {
-    std::cout << "USAGE: ";
-    std::cout << prg.substr( prg.find_last_of( "/" ) - 1 ) << " <clients> <serverip> " << std::endl;
-    std::cout << "  <clients> = Number of clients to connect to server > 0" << std::endl;
-    std::cout << "  <serverip> = IP address of IRC server to connect" << std::endl;
-    std::cout << "  <port> = Port number of IRC server to connect on" << std::endl;
-    return EXIT_FAILURE;
-}
-
-//
-// Main Entrypoint
-//
-int main( int ac, char** av ) {
-    std::string ipAddress;
-    int threadCount;
-    int port;
-    std::vector<std::thread> th;
-
-    if ( ac != 4 )
-        return usage( av[0] );
-
-    threadCount = std::stoi( av[1] );
-    ipAddress = av[2];
-    port = std::stoi( av[3] );
-
-    if ( threadCount <= 0 || !isValidIp( ipAddress ) || ( port <= 0 || port >= 65535 ) )
-        return usage( av[0] );
-
-    for ( int i = 0; i < threadCount; i++ ) {
-        th.push_back( std::thread( threadObj(), ipAddress, port, i + 1 ) );
-    }
-
-    for ( size_t i = 0; i < th.size(); i++ ) {
-        th[i].join();
-    }
-
-    std::cout << "Program Terminating" << std::endl;
-    return EXIT_SUCCESS;
-}
-
 //
 // Class Client Tester
 //
-clientTester::clientTester( const std::string ipAddress, const int port, const int clientId ) : m_ipAddress( ipAddress ),  m_clientId( clientId ), m_port( port ) {
+// m_vars 0 = ipAddress, 1 = port, 2 = clientId, 3 = time intervale (m_seconds), 4 = client fd (m_fd)
+clientTester::clientTester( const std::string ipAddress,
+                            const int port,
+                            const int clientId,
+                            Parse::ParseData* data ) : m_ipAddress( ipAddress ), m_port( port ), m_clientId( clientId ), m_data( data ) {
+    m_vars.push_back( ipAddress );
+    m_vars.push_back( std::to_string( port ) );
+    m_vars.push_back( std::to_string( clientId ) );
     sigInit();
     this->run();
 }
@@ -134,7 +40,6 @@ clientTester::~clientTester( ) {
 //
 // Sequence Loop
 void clientTester::run( void ) {
-    std::stringstream ss;
     std::linear_congruential_engine<unsigned int , 193703 , 0 , 83474882> lce;
     lce.seed( std::chrono::system_clock::now().time_since_epoch().count() );
 
@@ -142,7 +47,11 @@ void clientTester::run( void ) {
     if ( m_seconds <= 2 )
         m_seconds = 3;
 
-    ss << "Hello msg from client: " << m_clientId << std::endl;
+    m_vars.push_back( std::to_string( m_seconds ) );
+
+    mtx.lock();
+    std::cout << "Client " << m_clientId << ":* Waiting to Connect in " << m_seconds << " seconds" << std::endl;
+    mtx.unlock();
 
     for ( int i = 0; i <= m_seconds && running(); i++ )
         std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
@@ -156,7 +65,10 @@ void clientTester::run( void ) {
                 ircconnect();
 
             std::this_thread::sleep_for( std::chrono::milliseconds( 250 ) );
-            ircsend( ss.str() );
+
+            for ( std::vector<std::string>::const_iterator it = m_data->m_loop.begin(); it != m_data->m_loop.end(); ++it )
+                ircsend( replaceBuffer( *it ) );
+
             std::this_thread::sleep_for( std::chrono::milliseconds( 250 ));
 
             if ( RECONNECT_ON_MSG )
@@ -167,14 +79,14 @@ void clientTester::run( void ) {
         }
         catch ( std::ios_base::failure& ex ) {
             mtx.lock();
-            std::cout << "Client " << m_clientId << " failed to send message, retry in 30 seconds" << std::endl;
+            std::cout << "Client "<<  m_clientId  << ":" <<  m_fd  << " failed to send message, retry in 30 seconds" << std::endl;
             mtx.unlock();
             for ( int i = 0; i <= 30 && running(); i++ )
                 std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
         }
         catch ( std::runtime_error& ex ) {
             mtx.lock();
-            std::cout << "Client " << m_clientId << " " << ex.what() << std::endl;
+            std::cout << "Client " << m_clientId << ":" <<  m_fd << " " << ex.what() << std::endl;
             mtx.unlock();
             break ;
         }
@@ -204,6 +116,12 @@ void clientTester::ircconnect( void ) {
     if ( (m_fd = socket( AF_INET, SOCK_STREAM, 0 ) ) < 0 )
         throw std::runtime_error( "Unable to create socket" );
 
+    mtx.lock();
+    std::cout << "Client " << m_clientId << ":" << m_fd << " Connecting" << std::endl;
+    mtx.unlock();
+
+    m_vars.push_back( std::to_string( m_fd ) );
+
     std::memset( &address, 0, sizeof( address ) );
     address.sin_family = AF_INET;
     address.sin_port = htons( m_port );
@@ -212,16 +130,31 @@ void clientTester::ircconnect( void ) {
         throw std::runtime_error( "Conversion to sockaddr failed" );
 
     if ( ( connect( m_fd, (struct sockaddr*)&address, sizeof( address ) ) ) < 0 ) {
-        throw std::runtime_error( "Failed to connect to " + m_ipAddress + " on port " + std::to_string( m_port ) );
+        throw std::runtime_error( "Failed to connect to " +  m_ipAddress + " on port " + std::to_string( m_port ) );
     }
+
+    for ( std::vector<std::string>::const_iterator it = m_data->m_connect.begin(); it != m_data->m_connect.end(); ++it )
+        ircsend( replaceBuffer( *it ) );
+
+    char buffer[1025];
+    ssize_t byteRec;
+
+    while ( ( byteRec = recv( m_fd, &buffer, 1024, 0 ) ) <= 0) ;
+
+    for ( std::vector<std::string>::const_iterator it = m_data->m_afterConnect.begin(); it != m_data->m_afterConnect.end(); ++it )
+        ircsend( replaceBuffer( *it ) );
 }
 
 //
 // Client disconnect
 void clientTester::ircdisconnect( void ) {
+    for ( std::vector<std::string>::const_iterator it = m_data->m_disconnect.begin(); it != m_data->m_disconnect.end(); ++it )
+        ircsend( replaceBuffer( *it ) );
+
     close( m_fd );
+
     mtx.lock();
-    std::cout << "Client " << m_clientId << " closing socket" << std::endl;
+    std::cout << "Client " <<  m_clientId << ":" << m_fd << " closing socket" << std::endl;
     mtx.unlock();
 }
 
@@ -237,8 +170,9 @@ void clientTester::ircsend( const std::string msg ) {
 
     if ( send( m_fd, buffer, msg.size(), 0 ) < 0 )
         throw std::ios_base::failure("Failed to send message");
+
     mtx.lock();
-    std::cout << "Client sending msg: " + msg;
+    std::cout << "Client " << m_clientId << ":" << m_fd << " sending msg: " << msg;
     mtx.unlock();
 }
 
@@ -252,4 +186,27 @@ bool clientTester::running( void ) const {
         return false;
 
     return true;
+}
+
+std::string clientTester::replaceBuffer( const std::string& buffer ) {
+    std::string buff = std::string( buffer );
+
+    size_t spos = buffer.find( "{" );
+    size_t epos = buffer.find( "}" );
+
+    while ( spos != std::string::npos && epos != std::string::npos && spos - epos > 0 ) {
+        size_t vecLoc;
+
+        try { vecLoc = std::stoi( buff.substr( spos + 1, ( epos - 1 ) - spos ) ); }
+        catch ( std::invalid_argument& ex ) { return buffer; }
+
+        if ( vecLoc > m_vars.size() - 1 )
+            return buffer;
+
+        buff.replace( spos, ( epos + 1 ) - spos,  m_vars[vecLoc] );
+
+        spos = buff.find( "{" );
+        epos = buff.find( "}" );
+    }
+    return buff;
 }
