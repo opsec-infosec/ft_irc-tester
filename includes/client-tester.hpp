@@ -6,44 +6,49 @@
 /*   By: dfurneau <dfurneau@student.42abudhabi.ae>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 10:12:49 by dfurneau          #+#    #+#             */
-/*   Updated: 2023/03/14 11:20:01 by dfurneau         ###   ########.fr       */
+/*   Updated: 2023/04/12 01:50:21 by dfurneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CLIENT_TESTER_HPP
 # define CLIENT_TESTER_HPP
 
+# include "parse.hpp"
 # include <cstring>
+# include <string>
 # include <sstream>
 # include <iostream>
 # include <random>
-# include <thread>
-# include <csignal>
-# include <mutex>
 # include <netinet/in.h>
 # include <arpa/inet.h>
 # include <unistd.h>
+# include <variant>
 # include <vector>
+# include <map>
 
 class clientTester {
     public:
-        clientTester( const std::string ipAddress, const int port, const int clientId );
+        clientTester( const std::string ipAddress, const int port, const int clientId,  Parse::ParseData* data );
         ~clientTester( );
 
         void run( void );
 
     private:
+        std::vector<std::string> m_vars;
         const std::string m_ipAddress;
-        const int m_clientId;
         const int m_port;
         int m_seconds = 60;
         int m_fd;
+        int m_clientId;
+        Parse::ParseData* m_data;
 
         void ircconnect( void );
         void ircdisconnect( void );
         void ircsend( const std::string msg );
         void sigInit( void ) const;
         bool running( void ) const;
+
+        std::string replaceBuffer( const std::string& buffer );
 };
 
 #endif

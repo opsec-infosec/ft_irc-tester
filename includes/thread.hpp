@@ -1,0 +1,40 @@
+
+#ifndef THREAD_HPP
+# define THREAD_HPP
+
+# include "client-tester.hpp"
+# include "parse.hpp"
+
+# include <mutex>
+# include <thread>
+# include <csignal>
+
+inline std::mutex mtx;
+
+//
+// Signal Handler
+//
+namespace {
+    inline volatile std::atomic<int> gSignalStatus( 0 );
+    static_assert( std::atomic<int>::is_always_lock_free );
+}
+
+inline void signalHandler( int signal ) {
+    gSignalStatus.store( signal );
+}
+
+//
+// Thread Program
+//
+class threadObj {
+public:
+    void operator()( std::string ipAddress, int port, int clientId, Parse::ParseData* data )
+    {
+        clientTester client = clientTester( ipAddress, port, clientId, data );
+        mtx.lock();
+        std::cout << "Client " << clientId << ":* " << " exited" << std::endl;
+        mtx.unlock();
+    }
+};
+
+#endif
