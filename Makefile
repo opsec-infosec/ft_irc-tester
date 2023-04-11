@@ -6,7 +6,7 @@
 #    By: dfurneau <dfurneau@student.42abudhabi.ae>  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/07 07:25:25 by dfurneau          #+#    #+#              #
-#    Updated: 2023/04/12 01:11:47 by dfurneau         ###   ########.fr        #
+#    Updated: 2023/04/12 03:21:08 by dfurneau         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,7 @@ SSRCS		=	./src/main.cpp \
 
 SOBJS		=	${SSRCS:.cpp=.o}
 CXX			=	c++
-CXXFLAGS	=	-Wall -Wextra -Werror -std=c++20 ${DEBUG}
+CXXFLAGS	=	-Wall -Wextra -Werror -std=c++2a ${D} ${OPTIMIZE} #${DEBUG}
 LIBS		=	-pthread
 DEBUG		=	-g3
 OPTIMIZE	=	-O2
