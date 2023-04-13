@@ -6,7 +6,7 @@
 /*   By: dfurneau <dfurneau@student.42abudhabi.ae>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 10:12:40 by dfurneau          #+#    #+#             */
-/*   Updated: 2023/04/12 02:24:02 by dfurneau         ###   ########.fr       */
+/*   Updated: 2023/04/13 22:53:07 by dfurneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,8 +66,11 @@ void clientTester::run( void ) {
 
             std::this_thread::sleep_for( std::chrono::milliseconds( 250 ) );
 
-            for ( std::vector<std::string>::const_iterator it = m_data->m_loop.begin(); it != m_data->m_loop.end(); ++it )
+            for ( std::vector<std::string>::const_iterator it = m_data->m_loop.begin(); it != m_data->m_loop.end(); ++it ) {
                 ircsend( replaceBuffer( *it ) );
+                for ( size_t i = 0; i < m_delay; i++ )
+                    std::this_thread::sleep_for( std::chrono::milliseconds( 1 ) );
+            }
 
             std::this_thread::sleep_for( std::chrono::milliseconds( 250 ));
 
@@ -133,16 +136,22 @@ void clientTester::ircconnect( void ) {
         throw std::runtime_error( "Failed to connect to " +  m_ipAddress + " on port " + std::to_string( m_port ) );
     }
 
-    for ( std::vector<std::string>::const_iterator it = m_data->m_connect.begin(); it != m_data->m_connect.end(); ++it )
+    for ( std::vector<std::string>::const_iterator it = m_data->m_connect.begin(); it != m_data->m_connect.end(); ++it ) {
         ircsend( replaceBuffer( *it ) );
+        for ( size_t i = 0; i < m_delay; i++ )
+            std::this_thread::sleep_for( std::chrono::milliseconds( 1 ) );
+    }
 
-    char buffer[1025];
+    char buffer[1024];
     ssize_t byteRec;
 
-    while ( ( byteRec = recv( m_fd, &buffer, 1024, 0 ) ) <= 0) ;
+    while ( ( byteRec = recv( m_fd, &buffer, std::strlen( buffer ), 0 ) ) <= 0) ;
 
-    for ( std::vector<std::string>::const_iterator it = m_data->m_afterConnect.begin(); it != m_data->m_afterConnect.end(); ++it )
+    for ( std::vector<std::string>::const_iterator it = m_data->m_afterConnect.begin(); it != m_data->m_afterConnect.end(); ++it ) {
         ircsend( replaceBuffer( *it ) );
+        for ( size_t i = 0; i < m_delay; i++ )
+            std::this_thread::sleep_for( std::chrono::milliseconds( 1 ) );
+    }
 }
 
 //
@@ -161,6 +170,9 @@ void clientTester::ircdisconnect( void ) {
 //
 // Client send message
 void clientTester::ircsend( const std::string msg ) {
+    if ( msg.empty() )
+        return ;
+
     if ( !running() )
         return ;
 
@@ -208,5 +220,20 @@ std::string clientTester::replaceBuffer( const std::string& buffer ) {
         spos = buff.find( "{" );
         epos = buff.find( "}" );
     }
+
+    m_delay = 0;
+    spos = buff.find( "[" );
+    epos = buff.find( "]" );
+
+    while ( spos != std::string::npos && epos != std::string::npos && spos - epos > 0 ) {
+        try { m_delay = std::stoi( buff.substr( spos + 1, ( epos - 1) - spos ) ); }
+        catch ( std::invalid_argument& ex ) { }
+
+        buff.erase( spos );
+
+        spos = buff.find( "[" );
+        epos = buff.find( "]" );
+    }
+
     return buff;
 }
