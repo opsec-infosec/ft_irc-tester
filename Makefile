@@ -6,7 +6,7 @@
 #    By: dfurneau <dfurneau@student.42abudhabi.ae>  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/07 07:25:25 by dfurneau          #+#    #+#              #
-#    Updated: 2023/04/14 00:54:16 by dfurneau         ###   ########.fr        #
+#    Updated: 2023/04/14 01:22:44 by dfurneau         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,7 +18,7 @@ SSRCS		=	./src/main.cpp \
 
 
 SOBJS		=	${SSRCS:.cpp=.o}
-CXX			=	c++
+CXX			=	g++
 
 CXXFLAGS	=	-Wall -Wextra -Werror -std=c++2a
 

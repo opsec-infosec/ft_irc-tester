@@ -6,7 +6,7 @@
 /*   By: dfurneau <dfurneau@student.42abudhabi.ae>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 02:57:31 by dfurneau          #+#    #+#             */
-/*   Updated: 2023/04/14 00:15:18 by dfurneau         ###   ########.fr       */
+/*   Updated: 2023/04/14 01:06:49 by dfurneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,9 +45,6 @@ class Parse {
         std::string m_afterConf;
         std::string m_disconnectConf;
         std::string m_loopConf;
-
-        int m_port;
-        int m_fd;
 
         std::map<std::string, std::string> m_replace;
         bool m_init = false;
