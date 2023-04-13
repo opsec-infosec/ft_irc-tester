@@ -19,7 +19,9 @@ SSRCS		=	./src/main.cpp \
 
 SOBJS		=	${SSRCS:.cpp=.o}
 CXX			=	c++
+
 CXXFLAGS	=	-Wall -Wextra -Werror -std=c++20
+
 LIBS		=	-pthread
 
 RM			=	rm -f
