@@ -6,7 +6,7 @@
 /*   By: dfurneau <dfurneau@student.42abudhabi.ae>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 02:57:31 by dfurneau          #+#    #+#             */
-/*   Updated: 2023/04/12 02:57:34 by dfurneau         ###   ########.fr       */
+/*   Updated: 2023/04/14 00:15:18 by dfurneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 
 class Parse {
     public:
+        Parse( );
         Parse( const std::string& replaceConf, const std::string& connectConf, const std::string& afterConf, const std::string& disconnectConf, const std::string& loopConf );
         ~Parse( );
 

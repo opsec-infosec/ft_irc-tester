@@ -6,7 +6,7 @@
 /*   By: dfurneau <dfurneau@student.42abudhabi.ae>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 10:12:49 by dfurneau          #+#    #+#             */
-/*   Updated: 2023/04/13 17:43:56 by dfurneau         ###   ########.fr       */
+/*   Updated: 2023/04/14 00:28:28 by dfurneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define CLIENT_TESTER_HPP
 
 # include "parse.hpp"
+
 # include <cstring>
 # include <string>
 # include <sstream>
@@ -28,6 +29,7 @@
 
 class clientTester {
     public:
+        clientTester( );
         clientTester( const std::string ipAddress, const int port, const int clientId,  Parse::ParseData* data );
         ~clientTester( );
 
@@ -38,7 +40,7 @@ class clientTester {
         const std::string m_ipAddress;
         const int m_port;
         int m_seconds = 60;
-        int m_fd;
+        int m_fd = 0;
         int m_clientId;
         size_t m_delay;
         Parse::ParseData* m_data;

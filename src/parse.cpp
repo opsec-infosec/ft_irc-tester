@@ -6,11 +6,16 @@
 /*   By: dfurneau <dfurneau@student.42abudhabi.ae>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 00:13:18 by dfurneau          #+#    #+#             */
-/*   Updated: 2023/04/12 01:53:40 by dfurneau         ###   ########.fr       */
+/*   Updated: 2023/04/14 00:30:16 by dfurneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/parse.hpp"
+
+//
+// Parse Class
+//
+Parse::Parse( ) { }
 
 Parse::Parse( const std::string& replaceConf,
                 const std::string& connectConf,
@@ -30,7 +35,7 @@ Parse::Parse( const std::string& replaceConf,
 
  };
 
-Parse::~Parse() {
+Parse::~Parse( ) {
     if ( !m_data->m_connect.empty() )
         m_data->m_connect.erase( m_data->m_connect.begin(), m_data->m_connect.end() );
 
@@ -46,7 +51,8 @@ Parse::~Parse() {
     delete m_data;
  };
 
-
+//
+// Parse init
 void Parse::init( ) {
     if ( !m_init )
         throw std::runtime_error( "Not Initialized" );
@@ -76,6 +82,8 @@ void Parse::init( ) {
     loadConf( m_disconnectConf, m_data->m_disconnect );
 }
 
+//
+// Load configuration files
 void Parse::loadConf( const std::string& filename, std::vector<std::string>& vector ) {
     if ( !m_init )
         throw std::runtime_error( "Not Initialized" );

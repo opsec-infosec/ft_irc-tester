@@ -6,7 +6,7 @@
 /*   By: dfurneau <dfurneau@student.42abudhabi.ae>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 10:12:40 by dfurneau          #+#    #+#             */
-/*   Updated: 2023/04/12 00:13:04 by dfurneau         ###   ########.fr       */
+/*   Updated: 2023/04/14 00:39:19 by dfurneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,11 +54,12 @@ bool isValidIp( std::string ip ) {
 // Usage called from main
 //
 int usage( std::string prg ) {
-    std::cout << "USAGE: ";
-    std::cout << prg.substr( prg.find_last_of( "/" ) - 1 ) << " <clients> <serverip> " << std::endl;
+    std::cout << std::endl << "USAGE: ";
+    std::cout << prg.substr( prg.find_last_of( "/" ) + 1 ) << " <clients> <serverip> " << std::endl;
     std::cout << "  <clients> = Number of clients to connect to server > 0" << std::endl;
     std::cout << "  <serverip> = IP address of IRC server to connect" << std::endl;
     std::cout << "  <port> = Port number of IRC server to connect on" << std::endl;
+    std::cout << std::endl << "https://github.com/opsec-infosec/ft_irc-tester" << std::endl << std::endl;
     return EXIT_FAILURE;
 }
 
@@ -78,20 +79,29 @@ int main( int ac, char** av ) {
     ipAddress = av[2];
     port = std::stoi( av[3] );
 
-    Parse prse = Parse( "./conf/replace.conf", "./conf/connect.conf", "./conf/after-connect.conf", "./conf/disconnect.conf", "./conf/loop.conf" );
-    prse.init( );
-
     if ( threadCount <= 0 || !isValidIp( ipAddress ) || ( port <= 0 || port >= 65535 ) )
         return usage( av[0] );
 
+    Parse* p;
+    try {
+        p = new Parse( "./conf/replace.conf", "./conf/connect.conf", "./conf/after-connect.conf", "./conf/disconnect.conf", "./conf/loop.conf" );
+        p->init( );
+    }
+    catch ( std::runtime_error& ex ) {
+        std::cout << "Conf files missing from ./conf directory" << std::endl;
+        delete p;
+        return EXIT_FAILURE;
+    }
+
     for ( int i = 0; i < threadCount; i++ ) {
-        th.push_back( std::thread( threadObj(), ipAddress, port, i + 1, prse.m_data ) );
+        th.push_back( std::thread( threadObj(), ipAddress, port, i + 1, p->m_data ) );
     }
 
     for ( size_t i = 0; i < th.size(); i++ ) {
         th[i].join();
     }
 
-    std::cout << "Program Terminating" << std::endl;
+    std::cout << "Program Terminated" << std::endl;
+    delete p;
     return EXIT_SUCCESS;
 }

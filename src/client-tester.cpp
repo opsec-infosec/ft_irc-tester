@@ -6,7 +6,7 @@
 /*   By: dfurneau <dfurneau@student.42abudhabi.ae>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 10:12:40 by dfurneau          #+#    #+#             */
-/*   Updated: 2023/04/13 22:53:07 by dfurneau         ###   ########.fr       */
+/*   Updated: 2023/04/14 00:27:17 by dfurneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@
 //
 // Class Client Tester
 //
+clientTester::clientTester( ) : m_port( -1 ) { }
+
 // m_vars 0 = ipAddress, 1 = port, 2 = clientId, 3 = time intervale (m_seconds), 4 = client fd (m_fd)
 clientTester::clientTester( const std::string ipAddress,
                             const int port,
@@ -34,7 +36,12 @@ clientTester::clientTester( const std::string ipAddress,
 }
 
 clientTester::~clientTester( ) {
+    mtx.lock();
+    std::cout << "Client " <<  m_clientId << ":" << ( m_fd ? std::to_string( m_fd ) : "*" ) << " Closing socket" << std::endl;
+    mtx.unlock();
 
+    if ( m_fd )
+        close( m_fd );
 }
 
 //
@@ -56,8 +63,16 @@ void clientTester::run( void ) {
     for ( int i = 0; i <= m_seconds && running(); i++ )
         std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
 
-    if ( !RECONNECT_ON_MSG )
-        ircconnect();
+    try {
+        if ( !RECONNECT_ON_MSG )
+            ircconnect();
+    }
+    catch ( std::runtime_error& ex ) {
+        mtx.lock();
+        std::cout << "Client " << m_clientId << ":" << ( m_fd ? std::to_string( m_fd ) : "*" ) << " " << ex.what() << std::endl;
+        mtx.unlock();
+        return ;
+    }
 
     while ( running() ) {
         try {
@@ -132,9 +147,9 @@ void clientTester::ircconnect( void ) {
     if ( inet_pton( AF_INET, m_ipAddress.c_str(), &address.sin_addr ) <= 0 )
         throw std::runtime_error( "Conversion to sockaddr failed" );
 
-    if ( ( connect( m_fd, (struct sockaddr*)&address, sizeof( address ) ) ) < 0 ) {
+    if ( ( connect( m_fd, (struct sockaddr*)&address, sizeof( address ) ) ) < 0 )
         throw std::runtime_error( "Failed to connect to " +  m_ipAddress + " on port " + std::to_string( m_port ) );
-    }
+
 
     for ( std::vector<std::string>::const_iterator it = m_data->m_connect.begin(); it != m_data->m_connect.end(); ++it ) {
         ircsend( replaceBuffer( *it ) );
@@ -159,12 +174,6 @@ void clientTester::ircconnect( void ) {
 void clientTester::ircdisconnect( void ) {
     for ( std::vector<std::string>::const_iterator it = m_data->m_disconnect.begin(); it != m_data->m_disconnect.end(); ++it )
         ircsend( replaceBuffer( *it ) );
-
-    close( m_fd );
-
-    mtx.lock();
-    std::cout << "Client " <<  m_clientId << ":" << m_fd << " closing socket" << std::endl;
-    mtx.unlock();
 }
 
 //
@@ -200,6 +209,8 @@ bool clientTester::running( void ) const {
     return true;
 }
 
+//
+// Client runtime substitution of args
 std::string clientTester::replaceBuffer( const std::string& buffer ) {
     std::string buff = std::string( buffer );
 
