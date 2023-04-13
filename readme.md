@@ -90,10 +90,11 @@ Every tag `<password>` will be replaced by xxxx, similare to `<nick>` which will
 
 The connect.conf file is executed during the connection of a client to the server, the execution only happens once.  Commands in this file are send in rapid succession.
 <br>
-### after-connect.conf
+
+## after-connect.conf
 
 The after-connect.conf file is executed after establishing the connection to the server and are executed only once.
-
+A delay can be added between commands, see the section delay between commands
 <br>
 
 ## loop.conf
@@ -101,13 +102,34 @@ The after-connect.conf file is executed after establishing the connection to the
 The loop.conf file contains commands that are executed in a loop, sent at a random interval of time.
 <br>
 
-### disconnect.conf
+
+## disconnect.conf
 
 The disconnect.conf file is executed when the client disconnects from the server.  Since the client tester is running in an infinite loop, a control C will stop the client tester and the disconnect.conf commands will be executed on the server.
+<br>
+
+## **Delay between commands**
+The Delay between commands can be used in the connect.conf, after-connect.conf and loop.conf files.
+You can add a delay between commands with [1000] between commands, this will delay by 1000 miliseconds or 1 second.  An example is shown below.
+
+```
+PART <channel>
+[1000]
+JOIN <channel>
+```
+The above will part the channel ( the channel name replace in the replace.conf ) wait 1 second ( 1000 milisecond ) and then join the channel again.  The program will loop ( if used in the loop.conf ) after a random amount of time determined during startup.
+
+The Special Variables can also be used in combination with the above to use the random time delay like the following:
+```
+PART <channel>
+[{3}000]
+JOIN <channel>
+```
+Since the special variables {3} is the random timer interval in second, it will be replaced with the time interval determined during startup and then converted to delay in miliseconds, in this case if {3} delays for 3 seconds, the replacement will be [3000] which is 3 seconds ( 3000 miliseconds ).
 
 <br>
 
-## Special Variables
+## **Special Variables**
 
 There are some special variables that can be used in all the .conf files that get replaced by the client-tester.  The following values can be used:
 
@@ -117,7 +139,7 @@ There are some special variables that can be used in all the .conf files that ge
 
 {2} = replaced with the ClientId.  The ClientId is a internal numbers that is assigned durinmg the starting of each client.  The ClientID starts from 0...n, where n is the number of clients.  Each clientId is incremented by 1 on each client creation.
 
-{3} = replaced with the time interval of the clients send loop, and ranges from 3 to 60 seconds.
+{3} = replaced with the time interval of the clients send loop, and ranges from 3 to 60 seconds.  This can also be used in conjuction with the loop delay.
 
 {4} = replaced with the internal File Descriptor that is used to connect to the server.  Like the ClientId, the operating system will increment on each open / connect to the server.
 <br>

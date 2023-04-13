@@ -6,7 +6,7 @@
 /*   By: dfurneau <dfurneau@student.42abudhabi.ae>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 10:12:49 by dfurneau          #+#    #+#             */
-/*   Updated: 2023/04/12 01:50:21 by dfurneau         ###   ########.fr       */
+/*   Updated: 2023/04/13 17:43:56 by dfurneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ class clientTester {
         int m_seconds = 60;
         int m_fd;
         int m_clientId;
+        size_t m_delay;
         Parse::ParseData* m_data;
 
         void ircconnect( void );
