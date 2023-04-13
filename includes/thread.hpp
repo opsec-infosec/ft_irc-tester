@@ -6,7 +6,7 @@
 /*   By: dfurneau <dfurneau@student.42abudhabi.ae>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 02:57:16 by dfurneau          #+#    #+#             */
-/*   Updated: 2023/04/12 02:57:19 by dfurneau         ###   ########.fr       */
+/*   Updated: 2023/04/14 00:24:52 by dfurneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,14 +38,14 @@ inline void signalHandler( int signal ) {
 // Thread Program
 //
 class threadObj {
-public:
-    void operator()( std::string ipAddress, int port, int clientId, Parse::ParseData* data )
-    {
-        clientTester client = clientTester( ipAddress, port, clientId, data );
-        mtx.lock();
-        std::cout << "Client " << clientId << ":* " << " exited" << std::endl;
-        mtx.unlock();
-    }
+    public:
+        void operator()( std::string ipAddress, int port, int clientId, Parse::ParseData* data )
+        {
+            clientTester client = clientTester( ipAddress, port, clientId, data );
+            mtx.lock();
+            std::cout << "Client " << clientId << ":* " << "Thread exiting" << std::endl;
+            mtx.unlock();
+        }
 };
 
 #endif
