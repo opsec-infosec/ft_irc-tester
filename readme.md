@@ -1,7 +1,8 @@
 # Client Tester
 
 This tester creates multiple clients that connect to the server and send messages at
-random times.
+random times.  Each client has its own thread and will connect to the server, to avoid all the clients trying to connect at one time and send messages all at once, a random delay is introduced on each client.  For example, the command line client_tester 2 127.0.0.1 6667 will create 2 clients (threads), during the creation of the clients, client 1 may receive a delay of 5 seconds and client 2 may receive a delay of 30 seconds.  Durring the loop execution, client 1 will loop every 5 seconds and client 2 will loop every 30 seconds.  This creates an even distribution of clients connecting and sending loop messages to the server and spreads the load over all the connecting clients.
+
 The following arguments are needed:
 
 ```sh
@@ -117,7 +118,7 @@ PART <channel>
 [1000]
 JOIN <channel>
 ```
-The above will part the channel ( the channel name replace in the replace.conf ) wait 1 second ( 1000 milisecond ) and then join the channel again.  The program will loop ( if used in the loop.conf ) after a random amount of time determined during startup.
+The above will part the channel ( the channel name replaced by the tags specified in replace.conf ) wait 1 second ( 1000 milisecond ) and then join the channel again.  The program will loop ( if used in the loop.conf ) after a random amount of time determined during startup.
 
 The Special Variables can also be used in combination with the above to use the random time delay like the following:
 ```
@@ -139,7 +140,7 @@ There are some special variables that can be used in all the .conf files that ge
 
 {2} = replaced with the ClientId.  The ClientId is a internal numbers that is assigned durinmg the starting of each client.  The ClientID starts from 0...n, where n is the number of clients.  Each clientId is incremented by 1 on each client creation.
 
-{3} = replaced with the time interval of the clients send loop, and ranges from 3 to 60 seconds.  This can also be used in combination with the loop delay.
+{3} = replaced with the time interval of the clients send loop, and ranges from 3 to 60 seconds.  This can also be used in combination with the loop delay.  Each thread (client) will have its own random delay that is calculated when then thread is started up.
 
 {4} = replaced with the internal File Descriptor that is used to connect to the server.  Like the ClientId, the operating system will increment on each open / connect to the server.
 <br>
