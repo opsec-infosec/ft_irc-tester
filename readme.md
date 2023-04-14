@@ -146,4 +146,8 @@ There are some special variables that can be used in all the .conf files that ge
 <br>
 <br>
 
+As always, if you find an issue... Please submit a Pull Request.
+
+<opsec-infosec> Ravenclaw Rocks!!!  GO MAY PISCINE!!!
+
 ***NOTE: This client tester has only been tested on Linux, specifically Debian Bullseye, YMMV***
