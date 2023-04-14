@@ -82,13 +82,13 @@ The replace.conf file is used to replace text in the  < > with the value specifi
 <nick> client
 ```
 
-Every tag `<password>` will be replaced by xxxx, similare to `<nick>` which will be replaced by the word client in all the .conf files.
+Every tag `<password>` will be replaced by xxxx, similar to `<nick>` which will be replaced by the word client in all the .conf files.
 <br>
 
 
 ## connect.conf
 
-The connect.conf file is executed during the connection of a client to the server, the execution only happens once.  Commands in this file are send in rapid succession.
+The connect.conf file is executed during the connection of a client to the server, the execution only happens once.  Commands in this file are sent in rapid succession.
 <br>
 
 ## after-connect.conf
@@ -125,7 +125,7 @@ PART <channel>
 [{3}000]
 JOIN <channel>
 ```
-Since the special variables {3} is the random timer interval in second, it will be replaced with the time interval determined during startup and then converted to delay in miliseconds, in this case if {3} delays for 3 seconds, the replacement will be [3000] which is 3 seconds ( 3000 miliseconds ).
+Since the special variables {3} is the random timer interval in second, it will be replaced with the time interval determined during startup and then converted to delay in miliseconds, in this case if {3} delays for 5 seconds ( determined during the startup and randomly assigned ), the replacement will be [5000] which is 5 seconds ( 5000 miliseconds ).
 
 <br>
 
@@ -139,7 +139,7 @@ There are some special variables that can be used in all the .conf files that ge
 
 {2} = replaced with the ClientId.  The ClientId is a internal numbers that is assigned durinmg the starting of each client.  The ClientID starts from 0...n, where n is the number of clients.  Each clientId is incremented by 1 on each client creation.
 
-{3} = replaced with the time interval of the clients send loop, and ranges from 3 to 60 seconds.  This can also be used in conjuction with the loop delay.
+{3} = replaced with the time interval of the clients send loop, and ranges from 3 to 60 seconds.  This can also be used in combination with the loop delay.
 
 {4} = replaced with the internal File Descriptor that is used to connect to the server.  Like the ClientId, the operating system will increment on each open / connect to the server.
 <br>
