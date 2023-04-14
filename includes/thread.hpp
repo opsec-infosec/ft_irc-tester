@@ -6,7 +6,7 @@
 /*   By: dfurneau <dfurneau@student.42abudhabi.ae>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 02:57:16 by dfurneau          #+#    #+#             */
-/*   Updated: 2023/04/14 00:24:52 by dfurneau         ###   ########.fr       */
+/*   Updated: 2023/04/15 00:47:12 by dfurneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,10 @@
 # include "parse.hpp"
 
 # include <mutex>
+# include <atomic>
 # include <thread>
+# include <string>
+# include <iostream>
 # include <csignal>
 
 inline std::mutex mtx;

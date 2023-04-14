@@ -6,13 +6,14 @@
 /*   By: dfurneau <dfurneau@student.42abudhabi.ae>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 10:12:49 by dfurneau          #+#    #+#             */
-/*   Updated: 2023/04/14 00:28:28 by dfurneau         ###   ########.fr       */
+/*   Updated: 2023/04/15 00:40:11 by dfurneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CLIENT_TESTER_HPP
 # define CLIENT_TESTER_HPP
 
+# define BUFFSIZE 4095
 # include "parse.hpp"
 
 # include <cstring>

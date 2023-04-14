@@ -6,7 +6,7 @@
 /*   By: dfurneau <dfurneau@student.42abudhabi.ae>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 10:12:40 by dfurneau          #+#    #+#             */
-/*   Updated: 2023/04/14 00:39:19 by dfurneau         ###   ########.fr       */
+/*   Updated: 2023/04/15 00:51:59 by dfurneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,14 +82,15 @@ int main( int ac, char** av ) {
     if ( threadCount <= 0 || !isValidIp( ipAddress ) || ( port <= 0 || port >= 65535 ) )
         return usage( av[0] );
 
-    Parse* p;
+    Parse* p = nullptr;
     try {
         p = new Parse( "./conf/replace.conf", "./conf/connect.conf", "./conf/after-connect.conf", "./conf/disconnect.conf", "./conf/loop.conf" );
         p->init( );
     }
     catch ( std::runtime_error& ex ) {
         std::cout << "Conf files missing from ./conf directory" << std::endl;
-        delete p;
+        if ( p )
+            delete p;
         return EXIT_FAILURE;
     }
 
