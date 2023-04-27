@@ -6,7 +6,7 @@
 /*   By: dfurneau <dfurneau@student.42abudhabi.ae>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 10:12:40 by dfurneau          #+#    #+#             */
-/*   Updated: 2023/04/15 00:40:01 by dfurneau         ###   ########.fr       */
+/*   Updated: 2023/04/27 13:13:10 by dfurneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,9 +160,11 @@ void clientTester::ircconnect( void ) {
     char buffer[BUFFSIZE];
     ssize_t byteRec;
 
-    while ( ( byteRec = recv( m_fd, &buffer, BUFFSIZE, 0 ) ) <= 0) {
-        if ( byteRec > 0 )
-            std::cout << buffer << std::endl;
+    size_t timeOut = 10;
+    while ( ( byteRec = recv( m_fd, &buffer, BUFFSIZE, 0 ) ) <= 0 ) {
+        std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
+        if ( --timeOut <= 0 )
+            throw std::runtime_error( "Failed to receive reply" );
     }
 
     for ( std::vector<std::string>::const_iterator it = m_data->m_afterConnect.begin(); it != m_data->m_afterConnect.end(); ++it ) {
